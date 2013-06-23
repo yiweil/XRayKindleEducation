@@ -9,15 +9,12 @@ import com.csvreader.CsvReader;
 
 public class LoadData {
 
-	public static boolean checkChar(char c) {
-		int asc = (int)c;
-		if(asc >= 48 && asc <= 57) return true;
-		
-		if (asc >= 65  && asc <= 90) return true;
-		
-		if (asc >= 97 && asc <= 122) return true;
-		
-		if(asc == 20 || asc == 44 || asc == 46 ) return true;
+	public static boolean checkChar(Character c) {
+		if(Character.isAlphabetic(c)) return true;
+		if(Character.isLetter(c)) return true;
+		if(Character.isDigit(c)) return true;
+		if(Character.isSpaceChar(c)) return true;
+		if(Character.isWhitespace(c)) return true;
 		
 		return false;
 	}
@@ -28,7 +25,7 @@ public class LoadData {
              ArrayList<String[]> csvList = new ArrayList<String[]>();
              CsvReader reader = new CsvReader(csvFilePath,',',Charset.forName("UTF-8"));
              int i = 0;
-             while(reader.readRecord() && i < 100){
+             while(reader.readRecord() && i < 10000){
             	 String[] s = reader.getValues();
             	 csvList.add(s);
             	 i++;
@@ -43,14 +40,17 @@ public class LoadData {
     }
 	
 	public static boolean checkString(String s) {
-		boolean first = false;
+		boolean isFirst = false;
+		boolean isSecond = false;
 		for(char c : s.toCharArray()) {
-			char temp = c;
-			if(!checkChar(c) && first  && temp != ' ' && temp != ',' && temp != '.' && temp != '(' && temp != ')'
-					&& temp != '\'' && temp != '\"') 
+			if(!checkChar(c) && isFirst  && isSecond) 
 				return false;
-			if(checkChar(c)) first = false;
-			else first = true;
+			else if(!checkChar(c) && isFirst) isSecond = true;
+			else if(!checkChar(c) && !isFirst) isFirst = true;
+			else {
+				isFirst = false;
+				isSecond = false;
+			}
 		}
 		return true;
 	}
